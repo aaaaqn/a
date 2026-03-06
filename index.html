@@ -2,68 +2,68 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ネオン迷路ゲーム</title>
+<title>かわいい迷路ゲーム</title>
 
 <style>
 
 body{
 margin:0;
 font-family:sans-serif;
-background:#0f172a;
-color:white;
+background:#ffeef4;
 text-align:center;
+color:#444;
 }
 
 h1{
 margin-top:10px;
-color:#38bdf8;
+color:#ff6fa5;
 }
 
 #ui{
 margin:10px;
+font-size:18px;
 }
 
 #maze{
 display:grid;
 justify-content:center;
-margin:15px auto;
+margin:20px auto;
 }
 
 .cell{
-width:28px;
-height:28px;
+width:30px;
+height:30px;
+border-radius:4px;
 }
 
 .wall{
-background:#020617;
+background:#7c8cff;
 }
 
 .path{
-background:#1e293b;
+background:#ffffff;
 }
 
 .player{
-background:#38bdf8;
-box-shadow:0 0 10px #38bdf8;
+background:#ff6fa5;
 }
 
 .goal{
-background:#22c55e;
-box-shadow:0 0 10px #22c55e;
+background:#6ee7b7;
 }
 
 .coin{
-background:gold;
+background:#ffd166;
 border-radius:50%;
 }
 
 button{
 font-size:20px;
-padding:12px 18px;
+padding:10px 18px;
 margin:6px;
 border:none;
-border-radius:8px;
-background:#38bdf8;
+border-radius:10px;
+background:#ff9ecb;
 color:white;
 }
 
@@ -80,7 +80,7 @@ margin-top:10px;
 
 <body>
 
-<h1>ネオン迷路</h1>
+<h1>🌸 かわいい迷路ゲーム 🌸</h1>
 
 <div id="ui">
 ステージ: <span id="stage">1</span>　
@@ -104,7 +104,7 @@ margin-top:10px;
 <script>
 
 let stage=1
-let size=15
+let size=13
 let maze=[]
 let player={x:1,y:1}
 let goal={x:0,y:0}
@@ -179,7 +179,7 @@ coins.push({x:cx,y:cy})
 
 function drawMaze(){
 
-mazeDiv.style.gridTemplateColumns=`repeat(${size},28px)`
+mazeDiv.style.gridTemplateColumns=`repeat(${size},30px)`
 mazeDiv.innerHTML=""
 
 for(let y=0;y<size;y++){
