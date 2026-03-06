@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>迷路ゲーム</title>
+
+<style>
+body{
+    font-family: sans-serif;
+    text-align: center;
+    background: #f0f0f0;
+}
+
+h1{
+    margin-top:20px;
+}
+
+#maze{
+    display:grid;
+    grid-template-columns: repeat(10,40px);
+    width:400px;
+    margin:20px auto;
+}
+
+.cell{
+    width:40px;
+    height:40px;
+    border:1px solid #ccc;
+}
+
+.wall{
+    background:black;
+}
+
+.path{
+    background:white;
+}
+
+.player{
+    background:deepskyblue;
+}
+
+.goal{
+    background:limegreen;
+}
+</style>
+</head>
+
+<body>
+
+<h1>迷路ゲーム</h1>
+<p>矢印キーで青いマスを動かしてゴール(G)へ！</p>
+
+<div id="maze"></div>
+
+<script>
+
+const mazeData = [
+[1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,1,0,0,0,0,1],
+[1,0,1,0,1,0,1,1,0,1],
+[1,0,1,0,0,0,0,1,0,1],
+[1,0,1,1,1,1,0,1,0,1],
+[1,0,0,0,0,1,0,1,0,1],
+[1,1,1,1,0,1,0,1,0,1],
+[1,0,0,1,0,0,0,1,0,1],
+[1,0,0,0,0,1,0,0,0,1],
+[1,1,1,1,1,1,1,1,1,1]
+];
+
+const maze = document.getElementById("maze");
+
+let player = {x:1,y:1};
+let goal = {x:8,y:8};
+
+function drawMaze(){
+
+maze.innerHTML="";
+
+for(let y=0;y<10;y++){
+for(let x=0;x<10;x++){
+
+let cell=document.createElement("div");
+cell.classList.add("cell");
+
+if(mazeData[y][x]===1){
+cell.classList.add("wall");
+}else{
+cell.classList.add("path");
+}
+
+if(player.x===x && player.y===y){
+cell.classList.add("player");
+}
+
+if(goal.x===x && goal.y===y){
+cell.classList.add("goal");
+cell.textContent="G";
+}
+
+maze.appendChild(cell);
+
+}
+}
+
+}
+
+document.addEventListener("keydown",function(e){
+
+let newX=player.x;
+let newY=player.y;
+
+if(e.key==="ArrowUp") newY--;
+if(e.key==="ArrowDown") newY++;
+if(e.key==="ArrowLeft") newX--;
+if(e.key==="ArrowRight") newX++;
+
+if(mazeData[newY][newX]===0){
+player.x=newX;
+player.y=newY;
+}
+
+if(player.x===goal.x && player.y===goal.y){
+alert("ゴール！おめでとう！");
+player={x:1,y:1};
+}
+
+drawMaze();
+
+});
+
+drawMaze();
+
+</script>
+
+</body>
+</html>
