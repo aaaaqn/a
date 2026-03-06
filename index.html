@@ -2,51 +2,77 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ランダム迷路ゲーム</title>
+<title>ネオン迷路ゲーム</title>
 
 <style>
 
 body{
-font-family:sans-serif;
-text-align:center;
-background:#f0f0f0;
 margin:0;
+font-family:sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
 h1{
-margin:10px;
+margin-top:10px;
+color:#38bdf8;
 }
 
-#info{
+#ui{
 margin:10px;
-font-size:18px;
 }
 
 #maze{
 display:grid;
 justify-content:center;
-margin:10px auto;
+margin:15px auto;
 }
 
 .cell{
-width:32px;
-height:32px;
-border:1px solid #ddd;
+width:28px;
+height:28px;
 }
 
-.wall{background:#222;}
-.path{background:white;}
-.player{background:#3fa9ff;}
-.goal{background:#4caf50;}
+.wall{
+background:#020617;
+}
 
-#controls{
-margin-top:15px;
+.path{
+background:#1e293b;
+}
+
+.player{
+background:#38bdf8;
+box-shadow:0 0 10px #38bdf8;
+}
+
+.goal{
+background:#22c55e;
+box-shadow:0 0 10px #22c55e;
+}
+
+.coin{
+background:gold;
+border-radius:50%;
 }
 
 button{
 font-size:20px;
-padding:10px 20px;
-margin:5px;
+padding:12px 18px;
+margin:6px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+color:white;
+}
+
+button:active{
+transform:scale(0.9);
+}
+
+#controls{
+margin-top:10px;
 }
 
 </style>
@@ -54,8 +80,13 @@ margin:5px;
 
 <body>
 
-<h1>迷路ゲーム</h1>
-<div id="info">ステージ: <span id="stage">1</span></div>
+<h1>ネオン迷路</h1>
+
+<div id="ui">
+ステージ: <span id="stage">1</span>　
+コイン: <span id="coins">0</span>　
+時間: <span id="time">0</span>
+</div>
 
 <div id="maze"></div>
 
@@ -73,17 +104,24 @@ margin:5px;
 <script>
 
 let stage=1
-let size=11
+let size=15
 let maze=[]
 let player={x:1,y:1}
 let goal={x:0,y:0}
+let coins=[]
+let collected=0
+let time=0
 
 const mazeDiv=document.getElementById("maze")
 
+setInterval(()=>{
+time++
+document.getElementById("time").textContent=time
+},1000)
+
 function generateMaze(){
 
-size=11+stage*2
-if(size%2===0) size++
+size=13+stage*2
 
 maze=[]
 
@@ -97,7 +135,6 @@ maze[y][x]=1
 function carve(x,y){
 
 const dirs=[[2,0],[-2,0],[0,2],[0,-2]]
-
 dirs.sort(()=>Math.random()-0.5)
 
 for(let [dx,dy] of dirs){
@@ -109,7 +146,6 @@ if(nx>0 && ny>0 && nx<size-1 && ny<size-1 && maze[ny][nx]===1){
 
 maze[y+dy/2][x+dx/2]=0
 maze[ny][nx]=0
-
 carve(nx,ny)
 
 }
@@ -124,13 +160,26 @@ carve(1,1)
 player={x:1,y:1}
 goal={x:size-2,y:size-2}
 
-maze[goal.y][goal.x]=0
+coins=[]
+
+for(let i=0;i<stage+2;i++){
+
+let cx,cy
+
+do{
+cx=Math.floor(Math.random()*size)
+cy=Math.floor(Math.random()*size)
+}while(maze[cy][cx]!==0)
+
+coins.push({x:cx,y:cy})
+
+}
 
 }
 
 function drawMaze(){
 
-mazeDiv.style.gridTemplateColumns=`repeat(${size},32px)`
+mazeDiv.style.gridTemplateColumns=`repeat(${size},28px)`
 mazeDiv.innerHTML=""
 
 for(let y=0;y<size;y++){
@@ -146,6 +195,12 @@ if(player.x===x && player.y===y) cell.classList.add("player")
 
 if(goal.x===x && goal.y===y) cell.classList.add("goal")
 
+for(let c of coins){
+if(c.x===x && c.y===y){
+cell.classList.add("coin")
+}
+}
+
 mazeDiv.appendChild(cell)
 
 }
@@ -159,10 +214,21 @@ let nx=player.x+dx
 let ny=player.y+dy
 
 if(nx>=0 && ny>=0 && nx<size && ny<size){
+
 if(maze[ny][nx]===0){
 
 player.x=nx
 player.y=ny
+
+for(let i=0;i<coins.length;i++){
+if(coins[i].x===nx && coins[i].y===ny){
+
+coins.splice(i,1)
+collected++
+document.getElementById("coins").textContent=collected
+
+}
+}
 
 if(player.x===goal.x && player.y===goal.y){
 
@@ -176,6 +242,7 @@ generateMaze()
 drawMaze()
 
 }
+
 }
 
 }
