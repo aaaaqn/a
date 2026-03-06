@@ -2,134 +2,195 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>迷路ゲーム</title>
+<title>ランダム迷路ゲーム</title>
 
 <style>
+
 body{
-    font-family: sans-serif;
-    text-align: center;
-    background: #f0f0f0;
+font-family:sans-serif;
+text-align:center;
+background:#f0f0f0;
+margin:0;
 }
 
 h1{
-    margin-top:20px;
+margin:10px;
+}
+
+#info{
+margin:10px;
+font-size:18px;
 }
 
 #maze{
-    display:grid;
-    grid-template-columns: repeat(10,40px);
-    width:400px;
-    margin:20px auto;
+display:grid;
+justify-content:center;
+margin:10px auto;
 }
 
 .cell{
-    width:40px;
-    height:40px;
-    border:1px solid #ccc;
+width:32px;
+height:32px;
+border:1px solid #ddd;
 }
 
-.wall{
-    background:black;
+.wall{background:#222;}
+.path{background:white;}
+.player{background:#3fa9ff;}
+.goal{background:#4caf50;}
+
+#controls{
+margin-top:15px;
 }
 
-.path{
-    background:white;
+button{
+font-size:20px;
+padding:10px 20px;
+margin:5px;
 }
 
-.player{
-    background:deepskyblue;
-}
-
-.goal{
-    background:limegreen;
-}
 </style>
 </head>
 
 <body>
 
 <h1>迷路ゲーム</h1>
-<p>矢印キーで青いマスを動かしてゴール(G)へ！</p>
+<div id="info">ステージ: <span id="stage">1</span></div>
 
 <div id="maze"></div>
 
+<div id="controls">
+<div>
+<button onclick="move(0,-1)">↑</button>
+</div>
+<div>
+<button onclick="move(-1,0)">←</button>
+<button onclick="move(0,1)">↓</button>
+<button onclick="move(1,0)">→</button>
+</div>
+</div>
+
 <script>
 
-const mazeData = [
-[1,1,1,1,1,1,1,1,1,1],
-[1,0,0,0,1,0,0,0,0,1],
-[1,0,1,0,1,0,1,1,0,1],
-[1,0,1,0,0,0,0,1,0,1],
-[1,0,1,1,1,1,0,1,0,1],
-[1,0,0,0,0,1,0,1,0,1],
-[1,1,1,1,0,1,0,1,0,1],
-[1,0,0,1,0,0,0,1,0,1],
-[1,0,0,0,0,1,0,0,0,1],
-[1,1,1,1,1,1,1,1,1,1]
-];
+let stage=1
+let size=11
+let maze=[]
+let player={x:1,y:1}
+let goal={x:0,y:0}
 
-const maze = document.getElementById("maze");
+const mazeDiv=document.getElementById("maze")
 
-let player = {x:1,y:1};
-let goal = {x:8,y:8};
+function generateMaze(){
+
+size=11+stage*2
+if(size%2===0) size++
+
+maze=[]
+
+for(let y=0;y<size;y++){
+maze[y]=[]
+for(let x=0;x<size;x++){
+maze[y][x]=1
+}
+}
+
+function carve(x,y){
+
+const dirs=[[2,0],[-2,0],[0,2],[0,-2]]
+
+dirs.sort(()=>Math.random()-0.5)
+
+for(let [dx,dy] of dirs){
+
+let nx=x+dx
+let ny=y+dy
+
+if(nx>0 && ny>0 && nx<size-1 && ny<size-1 && maze[ny][nx]===1){
+
+maze[y+dy/2][x+dx/2]=0
+maze[ny][nx]=0
+
+carve(nx,ny)
+
+}
+
+}
+
+}
+
+maze[1][1]=0
+carve(1,1)
+
+player={x:1,y:1}
+goal={x:size-2,y:size-2}
+
+maze[goal.y][goal.x]=0
+
+}
 
 function drawMaze(){
 
-maze.innerHTML="";
+mazeDiv.style.gridTemplateColumns=`repeat(${size},32px)`
+mazeDiv.innerHTML=""
 
-for(let y=0;y<10;y++){
-for(let x=0;x<10;x++){
+for(let y=0;y<size;y++){
+for(let x=0;x<size;x++){
 
-let cell=document.createElement("div");
-cell.classList.add("cell");
+let cell=document.createElement("div")
+cell.classList.add("cell")
 
-if(mazeData[y][x]===1){
-cell.classList.add("wall");
-}else{
-cell.classList.add("path");
-}
+if(maze[y][x]===1) cell.classList.add("wall")
+else cell.classList.add("path")
 
-if(player.x===x && player.y===y){
-cell.classList.add("player");
-}
+if(player.x===x && player.y===y) cell.classList.add("player")
 
-if(goal.x===x && goal.y===y){
-cell.classList.add("goal");
-cell.textContent="G";
-}
+if(goal.x===x && goal.y===y) cell.classList.add("goal")
 
-maze.appendChild(cell);
+mazeDiv.appendChild(cell)
 
 }
 }
 
 }
 
-document.addEventListener("keydown",function(e){
+function move(dx,dy){
 
-let newX=player.x;
-let newY=player.y;
+let nx=player.x+dx
+let ny=player.y+dy
 
-if(e.key==="ArrowUp") newY--;
-if(e.key==="ArrowDown") newY++;
-if(e.key==="ArrowLeft") newX--;
-if(e.key==="ArrowRight") newX++;
+if(nx>=0 && ny>=0 && nx<size && ny<size){
+if(maze[ny][nx]===0){
 
-if(mazeData[newY][newX]===0){
-player.x=newX;
-player.y=newY;
-}
+player.x=nx
+player.y=ny
 
 if(player.x===goal.x && player.y===goal.y){
-alert("ゴール！おめでとう！");
-player={x:1,y:1};
+
+stage++
+document.getElementById("stage").textContent=stage
+
+generateMaze()
+
 }
 
-drawMaze();
+drawMaze()
 
-});
+}
+}
 
-drawMaze();
+}
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="ArrowUp") move(0,-1)
+if(e.key==="ArrowDown") move(0,1)
+if(e.key==="ArrowLeft") move(-1,0)
+if(e.key==="ArrowRight") move(1,0)
+
+})
+
+generateMaze()
+drawMaze()
 
 </script>
 
